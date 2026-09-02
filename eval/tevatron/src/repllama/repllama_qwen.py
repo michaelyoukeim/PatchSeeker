@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.nn as nn
 from torch import Tensor
@@ -54,14 +55,24 @@ class RepLLaMA(EncoderModel):
 
     @classmethod
     def load(cls, model_name_or_path, **hf_kwargs):
-        # Load Qwen3 model directly without LoRA
-        base_model = AutoModel.from_pretrained(model_name_or_path, **hf_kwargs)
-        
-        # Set padding token ID if not already set
+        adapter_name_or_path = os.environ.get("PATCHSEEKER_ADAPTER")
+        if adapter_name_or_path:
+            from peft import PeftConfig
+
+            peft_config = PeftConfig.from_pretrained(adapter_name_or_path)
+            base_model_name_or_path = model_name_or_path or peft_config.base_model_name_or_path
+            print(f"Loading base model: {base_model_name_or_path}")
+            print(f"Loading PatchSeeker adapter: {adapter_name_or_path}")
+            base_model = AutoModel.from_pretrained(base_model_name_or_path, **hf_kwargs)
+            base_model = PeftModel.from_pretrained(base_model, adapter_name_or_path)
+            if hasattr(base_model, "merge_and_unload"):
+                base_model = base_model.merge_and_unload()
+        else:
+            base_model = AutoModel.from_pretrained(model_name_or_path, **hf_kwargs)
+
         if base_model.config.pad_token_id is None:
             base_model.config.pad_token_id = 0
-        
-        # Initialize RepLLaMA with the loaded model
+
         model = cls(
             lm_q=base_model,
             lm_p=base_model,

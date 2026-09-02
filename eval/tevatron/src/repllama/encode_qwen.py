@@ -48,11 +48,28 @@ def main():
         level=logging.INFO if training_args.local_rank in [-1, 0] else logging.WARN,
     )
 
-    # saving and loading pickle of model and tokenizer, to save time on loading
-    pickle_path= model_args.model_pickle_path
-    if not os.path.exists(pickle_path):
-        print(f"Pickle path: {pickle_path} not exists.")
-    
+    pickle_path = model_args.model_pickle_path
+    model = None
+    tokenizer = None
+    if os.path.exists(pickle_path):
+        print(f"Pickle path: {pickle_path} exists, trying to load.")
+        try:
+            with open(pickle_path, "rb") as f:
+                saved = pickle.load(f)
+            model = saved["model"]
+            tokenizer = saved["tokenizer"]
+            print(f"Model and tokenizer pickle loaded: {pickle_path}")
+        except Exception as error:
+            print(f"Failed to load pickle {pickle_path}: {error}")
+            print("Removing bad pickle and falling back to a fresh model load.")
+            model = None
+            tokenizer = None
+            try:
+                os.remove(pickle_path)
+            except OSError:
+                pass
+
+    if model is None or tokenizer is None:
         print("Loading tokenizer ...")
         tokenizer = AutoTokenizer.from_pretrained(
             model_args.tokenizer_name if model_args.tokenizer_name else model_args.model_name_or_path,
@@ -61,7 +78,6 @@ def main():
         #for qwen is eos and for llama or cr is unk
         tokenizer.pad_token_id = tokenizer.eos_token_id
         tokenizer.pad_token = tokenizer.eos_token
-        
         tokenizer.padding_side = "right"
 
         print("Loading model ...")
@@ -70,17 +86,16 @@ def main():
             cache_dir=model_args.cache_dir,
         )
         print("Model loaded")
-        with open(pickle_path, "wb") as f:
-            pickle.dump({"model": model, "tokenizer": tokenizer}, f)
+        try:
+            with open(pickle_path, "wb") as f:
+                pickle.dump({"model": model, "tokenizer": tokenizer}, f)
             print("Model and tokenizer pickle dumped")
-    
-    else:
-        # print(f"{pickle_path} already exist.")
-        with open(pickle_path, "rb") as f:
-            saved = pickle.load(f)
-            model = saved["model"]
-            tokenizer = saved["tokenizer"]
-        print(f"Model and tokenizer pickle loaded: {pickle_path}")
+        except Exception as error:
+            print(f"Failed to write pickle {pickle_path}: {error}")
+            try:
+                os.remove(pickle_path)
+            except OSError:
+                pass
     
     text_max_length = data_args.q_max_len if data_args.encode_is_qry else data_args.p_max_len
     if data_args.encode_is_qry:
