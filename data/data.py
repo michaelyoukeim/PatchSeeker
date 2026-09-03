@@ -1,6 +1,5 @@
 import pandas as pd
 import json
-import os
 from config import DATA_INPUT_CSV, DATA_OUTPUT_JSON
 
 file_path = DATA_INPUT_CSV
@@ -11,20 +10,6 @@ df = pd.read_csv(file_path, encoding='latin-1')
 
 data_dict = {}
 docid = set()  # Use a set instead of a list for faster lookups
-
-def patchseeker_text_value(value):
-    if pd.isna(value):
-        return ""
-    return str(value)
-
-
-def patchseeker_passage_text(row):
-    message = patchseeker_text_value(row.get("msg_token", ""))
-    if os.environ.get("PATCHSEEKER_TEXT_MODE", "message") == "message_diff":
-        diff = patchseeker_text_value(row.get("diff_token", ""))
-        if diff.strip():
-            return message + "\n\nPatch:\n" + diff
-    return message
 
 for _, row in df.iterrows():
     cve = row["cve"]
@@ -47,7 +32,7 @@ for _, row in df.iterrows():
             data_dict[cve]["positive_passages"].append({
                 "docid": commit,
                 "is_selected": need,
-                "text": patchseeker_passage_text(row),
+                "text": row["msg_token"],
                 "title": " "
             })
         else:
@@ -55,7 +40,7 @@ for _, row in df.iterrows():
             data_dict[cve]["negative_passages"].append({
                 "docid": commit,
                 "is_selected": need,
-                "text": patchseeker_passage_text(row),
+                "text": row["msg_token"],
                 "title": " "
             })
 
