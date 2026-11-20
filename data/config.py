@@ -4,7 +4,10 @@ import os
 _BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # === Base roots (relative to data/) ===
-_DATA_REPLLAMA = os.path.join(_BASE_DIR, "..", "..", "tuanna", "data_repllama")
+_DATA_REPLLAMA = os.environ.get(
+    "PATCHSEEKER_DATA_REPLLAMA_DIR",
+    os.path.join(_BASE_DIR, "..", "..", "tuanna", "data_repllama")
+)
 _TEVATRON_SRC = os.path.join(_BASE_DIR, "..", "..", "tuanna", "tevatron_v1", "tevatron", "src")
 _CCT5_OUTPUTS = os.path.join(_BASE_DIR, "..", "..", "tuanna", "CCT5", "outputs_0706")
 _GITHUB_CLONE = os.path.join(_BASE_DIR, "..", "..", "..", "code", "github_clone")

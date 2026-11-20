@@ -45,7 +45,7 @@ def process_csv_in_chunks(input_csv, chunk_size=CHUNK_SIZE):
     # Ensure fresh output
     init_output_files()
 
-    reader = pd.read_csv(input_csv, chunksize=chunk_size, encoding='latin-1')
+    reader = pd.read_csv(input_csv, chunksize=chunk_size, encoding='utf-8')
     for chunk in reader:
         # Collect partial results by file type
         partial = defaultdict(list)
@@ -74,7 +74,7 @@ def process_csv_in_chunks(input_csv, chunk_size=CHUNK_SIZE):
             df_part = pd.DataFrame(records)
             # Write header only if file is new
             header = not os.path.exists(out_file)
-            df_part.to_csv(out_file, index=False, mode='a', header=header)
+            df_part.to_csv(out_file, index=False, mode='a', header=header, encoding='utf-8')
             print(f"Appended {len(df_part)} rows to {out_file}")
 
 
@@ -88,9 +88,9 @@ def concat_predictions_for_type(ft):
         print(f"Skipping {ft}: missing {src_csv} or {preds_txt}")
         return
 
-    with open(src_csv, newline='', encoding='latin-1') as in_f, \
-         open(preds_txt, encoding='latin-1') as pred_f, \
-         open(final_csv, 'w', newline='', encoding='latin-1') as out_f:
+    with open(src_csv, newline='', encoding='utf-8') as in_f, \
+         open(preds_txt, encoding='utf-8') as pred_f, \
+         open(final_csv, 'w', newline='', encoding='utf-8') as out_f:
 
         reader = csv.DictReader(in_f)
         writer = csv.DictWriter(out_f, fieldnames=reader.fieldnames)

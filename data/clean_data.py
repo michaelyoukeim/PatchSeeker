@@ -5,7 +5,7 @@ input_file = CLEAN_DATA_INPUT
 output_file = CLEAN_DATA_OUTPUT
 
 # Đọc file JSON đầu vào
-with open(input_file, "r", encoding="latin-1") as f:
+with open(input_file, "r", encoding="utf-8") as f:
     data = json.load(f, parse_constant=lambda x: "" if x == "NaN" else x)
 
 # Xử lý "NaN" trong positive_passages và negative_passages
@@ -31,12 +31,12 @@ print(f"Đã lọc {n} item không hợp lệ.")
 if not filtered_data:
     print("Không có dữ liệu hợp lệ để ghi vào file đầu ra.")
 else:
-    with open(output_file, "w", encoding="latin-1") as f:
+    with open(output_file, "w", encoding="utf-8") as f:
         json.dump(filtered_data, f, indent=2, ensure_ascii=False)
     
     # Kiểm tra file đầu ra
     try:
-        with open(output_file, "r", encoding="latin-1") as f:
+        with open(output_file, "r", encoding="utf-8") as f:
             test_data = json.load(f)
             print("File JSON đầu ra hợp lệ!")
     except json.JSONDecodeError as e:

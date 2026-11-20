@@ -6,7 +6,7 @@ file_path = DATA_INPUT_CSV
 
 
 # Read the CSV with the detected encoding
-df = pd.read_csv(file_path, encoding='latin-1')
+df = pd.read_csv(file_path, encoding='utf-8')
 
 data_dict = {}
 docid = set()  # Use a set instead of a list for faster lookups
@@ -46,5 +46,5 @@ for _, row in df.iterrows():
 
 output_file = DATA_OUTPUT_JSON
 
-with open(output_file, "w") as f:
+with open(output_file, "w", encoding="utf-8") as f:
     json.dump(list(data_dict.values()), f, indent=4)

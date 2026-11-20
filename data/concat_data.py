@@ -12,7 +12,7 @@ def build_docid_hashmap(csv_files):
     docid_to_cct5 = {}
     for csv_file in csv_files:
         try:
-            df = pd.read_csv(csv_file,encoding='latin-1')
+            df = pd.read_csv(csv_file,encoding='utf-8')
             for _, row in df.iterrows():
                 if row['len_text'] <=5 :
                     docid = row['commit_id']
@@ -27,7 +27,7 @@ def process_json_file(json_file_path, docid_to_cct5, matched_entries, matched_do
     try:
         match_count = 0  # Initialize counter for matched passages
         n = 0
-        with open(json_file_path, 'r', encoding='latin-1') as f:
+        with open(json_file_path, 'rb') as f:
             # Use ijson to stream JSON objects
             parser = ijson.items(f, 'item')
             for cve_entry in parser:
@@ -71,7 +71,7 @@ def process_json_file(json_file_path, docid_to_cct5, matched_entries, matched_do
 def save_matched_entries(matched_entries, output_json_path):
     """Save matched CVE entries to a new JSON file."""
     try:
-        with open(output_json_path, 'w', encoding='latin-1') as f:
+        with open(output_json_path, 'w', encoding='utf-8') as f:
             json.dump(matched_entries, f, indent=4, ensure_ascii=False)
         print(f"Saved {len(matched_entries)} matched CVE entries to {output_json_path}")
     except IOError as e:
@@ -80,7 +80,7 @@ def save_matched_entries(matched_entries, output_json_path):
 def save_matched_docids(matched_docids, output_docids_path):
     """Save matched docids to a text file."""
     try:
-        with open(output_docids_path, 'w', encoding='latin-1') as f:
+        with open(output_docids_path, 'w', encoding='utf-8') as f:
             for docid in matched_docids:
                 f.write(f"{docid}\n")
         print(f"Saved {len(matched_docids)} matched docids to {output_docids_path}")

@@ -10,7 +10,7 @@ from config import (CORPUS_QUERY_RAW_JSON, CORPUS_QUERY_CORPUS_OUT,
 #     data = [json.loads(line) for line in f]
 
 raw_json_file = CORPUS_QUERY_RAW_JSON
-with open(raw_json_file, "r",encoding = "latin-1") as f:
+with open(raw_json_file, "r",encoding = "utf-8") as f:
     data = json.load(f)
 
 # Tạo file corpus (cve_corpus.json)
@@ -28,7 +28,7 @@ for item in tqdm(data, desc="Building corpus"):
         doc = {"docid": passage["docid"], "text": text, "query_id": item["query_id"], "query": item["query"]}
         corpus.append(doc)
 
-with open(CORPUS_QUERY_CORPUS_OUT, "w") as f:
+with open(CORPUS_QUERY_CORPUS_OUT, "w", encoding="utf-8") as f:
     json.dump(corpus, f, indent=4)
 
 # Tạo file queries (cve_queries.json)
@@ -39,12 +39,12 @@ for item in data:
     query = {"query_id": item["query_id"], "query": query_text}
     queries.append(query)
 
-with open(CORPUS_QUERY_QUERIES_OUT, "w") as f:
+with open(CORPUS_QUERY_QUERIES_OUT, "w", encoding="utf-8") as f:
     json.dump(queries, f, indent=4)
 
 # Tạo file qrels TREC
 
-with open(CORPUS_QUERY_QRELS_OUT, "w") as f:
+with open(CORPUS_QUERY_QRELS_OUT, "w", encoding="utf-8") as f:
     for item in data:
         query_id = item["query_id"]
         for passage in item["positive_passages"]:

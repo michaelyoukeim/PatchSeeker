@@ -48,7 +48,7 @@ def process_csv_to_jsonl(csv_file_path):
     file_types_data = defaultdict(list)
     
     try:
-        with open(csv_file_path, 'r', encoding='latin-1') as csvfile:
+        with open(csv_file_path, 'r', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
                 diff = row["diff_token"]
@@ -72,7 +72,7 @@ def process_csv_to_jsonl(csv_file_path):
     if file_types_data:
         for file_type, records in file_types_data.items():
             output_file = f"cct5_test_new_{file_type}.jsonl"
-            with open(output_file, 'w', encoding='latin-1') as f:  # Lưu file JSONL luôn dùng UTF-8
+            with open(output_file, 'w', encoding='utf-8') as f:  # Lưu file JSONL luôn dùng UTF-8
                 for record in records:
                     json.dump(record, f)
                     f.write('\n')
