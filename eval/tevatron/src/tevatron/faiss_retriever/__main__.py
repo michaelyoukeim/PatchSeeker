@@ -18,10 +18,11 @@ logging.basicConfig(
 
 
 def search_queries(retriever, q_reps, p_lookup, args):
+    depth = min(args.depth, retriever.index.ntotal)
     if args.batch_size > 0:
-        all_scores, all_indices = retriever.batch_search(q_reps, args.depth, args.batch_size, args.quiet)
+        all_scores, all_indices = retriever.batch_search(q_reps, depth, args.batch_size, args.quiet)
     else:
-        all_scores, all_indices = retriever.search(q_reps, args.depth)
+        all_scores, all_indices = retriever.search(q_reps, depth)
 
     psg_indices = [[str(p_lookup[x]) for x in q_dd] for q_dd in all_indices]
     psg_indices = np.array(psg_indices)
